@@ -17,7 +17,9 @@ public class CubeProperties : MonoBehaviour {
     private float maxDrag = 0.6f;
     private float distance_to_screen;
     private float offsetX;
+    private Vector3 currentPos;
     private int scoreInc;
+    private bool allowDrag;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +28,7 @@ public class CubeProperties : MonoBehaviour {
 
     void OnMouseDown() {
         selected = true;
+        allowDrag = false;
         Globals.clearGroup();
         Globals.group.Add(transform.gameObject);
         prevPos = transform.position;
@@ -37,7 +40,10 @@ public class CubeProperties : MonoBehaviour {
         }
         distance_to_screen = Camera.main.WorldToScreenPoint(transform.position).z;
         Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-        offsetX = transform.position.x - temp_pos.x;
+        if (fall)
+            offsetX = transform.position.x - temp_pos.x;
+        else
+            offsetX = 0;
     }
 
 
@@ -48,43 +54,47 @@ public class CubeProperties : MonoBehaviour {
 
             pos_move.x = pos_move.x + offsetX;
 
+            if (Mathf.Abs(pos_move.x - prevPos.x) > 0.3f) {
+                allowDrag = true;
+            }
+            if (allowDrag) {
+                // Check if an object is blocking this cube to the left
+                // The +/- 0.01f is necessary to prevent collision detection when a cube is touching from above/below
+                Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f + offsetX, transform.position.z);
+                Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f + offsetX, transform.position.z);
+                if (Physics.Raycast(originU, Vector3.left, size) || Physics.Raycast(originD, Vector3.left, size))
+                    dragLeft = false;
+                else
+                    dragLeft = true;
 
-            // Check if an object is blocking this cube to the left
-            // The +/- 0.01f is necessary to prevent collision detection when a cube is touching from above/below
-            Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f + offsetX, transform.position.z);
-            Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f + offsetX, transform.position.z);
-            if (Physics.Raycast(originU, Vector3.left, size) || Physics.Raycast(originD, Vector3.left, size))
-                dragLeft = false;
-            else
-                dragLeft = true;
+                // Check if an object is blocking this cube to the right
+                if (Physics.Raycast(originU, Vector3.right, size) || Physics.Raycast(originD, Vector3.right, size))
+                    dragRight = false;
+                else
+                    dragRight = true;
 
-            // Check if an object is blocking this cube to the right
-            if (Physics.Raycast(originU, Vector3.right, size) || Physics.Raycast(originD, Vector3.right, size))
-                dragRight = false;
-            else
-                dragRight = true;
 
-            
-            // Prevent dragging left or right if an object is blocking in that direction
-            if ((!dragLeft && pos_move.x <= transform.position.x) || (!dragRight && pos_move.x >= transform.position.x))
-                pos_move.x = transform.position.x;
+                // Prevent dragging left or right if an object is blocking in that direction
+                if ((!dragLeft && pos_move.x <= transform.position.x) || (!dragRight && pos_move.x >= transform.position.x))
+                    pos_move.x = transform.position.x;
 
-            // Clamp maximum left drag 
-            if (transform.position.x >= pos_move.x)
-            if (transform.position.x - pos_move.x > maxDrag)
-                pos_move.x = transform.position.x - maxDrag;
-            if (pos_move.x < 0)
-                pos_move.x = 0;
-            
-            // Clamp maximum right drag
-            if (transform.position.x <= pos_move.x)
-                if (pos_move.x - transform.position.x > maxDrag)
-                    pos_move.x = transform.position.x + maxDrag;
-            if (pos_move.x > 11)
-                pos_move.x = 11;
+                // Clamp maximum left drag 
+                if (transform.position.x >= pos_move.x)
+                    if (transform.position.x - pos_move.x > maxDrag)
+                        pos_move.x = transform.position.x - maxDrag;
+                if (pos_move.x < 0)
+                    pos_move.x = 0;
 
-            // Update to new adjusted position
-            transform.position = new Vector3(pos_move.x, transform.position.y, pos_move.z);
+                // Clamp maximum right drag
+                if (transform.position.x <= pos_move.x)
+                    if (pos_move.x - transform.position.x > maxDrag)
+                        pos_move.x = transform.position.x + maxDrag;
+                if (pos_move.x > 11)
+                    pos_move.x = 11;
+
+                // Update to new adjusted position
+                transform.position = new Vector3(pos_move.x, transform.position.y, pos_move.z);
+            }
 
         }
         
@@ -121,11 +131,24 @@ public class CubeProperties : MonoBehaviour {
     void FixedUpdate() {
         if(!Globals.paused) {
             // Check to see if either side of the cube is blocked by an object downwards
+            // Round the y position of the block as it hits an object provided that object isn't falling
+            // If the cube is white then call the function to destroy nearby cubes
             Vector3 originL = new Vector3(transform.position.x - size + 0.01f, transform.position.y, transform.position.z);
             Vector3 originR = new Vector3(transform.position.x + size - 0.01f, transform.position.y, transform.position.z);
-            if (Physics.Raycast(originL, Vector3.down, size) || Physics.Raycast(originR, Vector3.down, size)) {
+
+            if (Physics.Raycast(originL, Vector3.down, out hit, size) || Physics.Raycast(originR, Vector3.down, out hit, size)) {
                 fall = false;
                 fallSpeed = 2;
+                if (hit.transform.tag == "Boundary") {
+                    transform.position = new Vector3(transform.position.x, Mathf.Round(transform.position.y), transform.position.z);
+                    checkBomb();
+                }
+                else if (hit.transform.tag == "Cube") { 
+                    if (!hit.transform.GetComponent<CubeProperties>().fall) {
+                        transform.position = new Vector3(transform.position.x, Mathf.Round(transform.position.y), transform.position.z);
+                        checkBomb();
+                    }
+                }
             }
             else
                 fall = true;
@@ -158,10 +181,10 @@ public class CubeProperties : MonoBehaviour {
                 Globals.gameOver = true;
 
             // Prevent cube from going out of bounds
-            if (transform.position.x < 0)
-                transform.position = new Vector3(0, transform.position.y, transform.position.z);
-            if (transform.position.x > 11)
-                transform.position = new Vector3(11, transform.position.y, transform.position.z);
+            if (transform.position.x < 1)
+                transform.position = new Vector3(1, transform.position.y, transform.position.z);
+            if (transform.position.x > 10)
+                transform.position = new Vector3(10, transform.position.y, transform.position.z);
 
             // Change this cube's frame colour
             if (selected)
@@ -194,6 +217,47 @@ public class CubeProperties : MonoBehaviour {
                     }
                 }
             }
+        }
+    }
+
+    void destroyCube(Vector3 dir) {
+        if (Physics.Raycast(transform.position, dir, out hit, size * 2)) {
+            if (hit.transform.tag == "Cube") {
+                print(hit.transform.GetComponent<CubeProperties>().colour);
+                Destroy(hit.transform.gameObject);
+                Globals.score++;
+            }
+        }
+    }
+
+    // If cube is a white bomb, destroy surrounding blocks
+    public void checkBomb() {
+        if(colour == Color.white) {
+
+            // Find and destroy cubes in all surrounding directions upon landing
+            destroyCube(Vector3.left);
+            destroyCube(Vector3.right);
+            destroyCube(Vector3.down);
+            destroyCube(new Vector3(1, 1, 0));
+            destroyCube(new Vector3(1, -1, 0));
+            destroyCube(new Vector3(-1, -1, 0));
+            destroyCube(new Vector3(-1, 1, 0));
+
+            /*
+            int numOfRays = 8;
+            float angle = 0;
+            for(int i = 0; i < numOfRays; i++) {
+                float x = Mathf.Sin(angle);
+                float y = Mathf.Cos(angle);
+                Vector3 dir = new Vector3(x, y, 0);
+                angle += 2 * Mathf.PI / numOfRays;
+                Debug.DrawLine(transform.position, dir, Color.red, 2);
+                destroyCube(dir);
+            }*/
+            if (Globals.group.Contains(gameObject))
+                Globals.clearGroup();
+            Globals.score++;
+            Destroy(gameObject);
         }
     }
 

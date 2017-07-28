@@ -15,14 +15,14 @@ public class Globals : MonoBehaviour {
     private Vector2 pressPosInit;
     private Vector2 pressPosEnd;
     private Vector3 currentSwipe;
-    private float minSwipeLength = 50f;
+    private float minSwipeLength = 100f;
     private Ray ray;
     private RaycastHit hit;
 
     // Setup start of level settings
     protected void Awake()
     {
-        createTime = 2.0f;
+        createTime = 1.0f;
         score = 0;
         gameOver = false;
         paused = false;
@@ -78,7 +78,7 @@ public class Globals : MonoBehaviour {
         return false;   
     }
 
-
+    // Swipe down to increase fall speed
     void swipe() {
         if (Input.touches.Length > 0) {
             Touch t = Input.GetTouch(0);
@@ -106,7 +106,7 @@ public class Globals : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        swipe();
+        //swipe();
     }
 
     // Update is called once per frame

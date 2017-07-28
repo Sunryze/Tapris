@@ -7,6 +7,7 @@ TagManager:
   - Cube
   - Draggable
   - overlay
+  - Boundary
   layers:
   - Default
   - TransparentFX
