@@ -6,7 +6,10 @@ public class Globals : MonoBehaviour {
 
     public static bool gameOver, paused;
     public static int score;
-    public static float fallSpeed, createTime;
+    public static float elapsedTime;    // Game time in seconds, not counting pause
+    public static float fallSpeed;
+    public static float createTime, decreaseTimer;
+    public static float allowWhite, allowGrey;
     public Text endText;
     public static ArrayList group;
     public static ArrayList pos;
@@ -18,11 +21,14 @@ public class Globals : MonoBehaviour {
     private float minSwipeLength = 100f;
     private Ray ray;
     private RaycastHit hit;
+    
 
     // Setup start of level settings
     protected void Awake()
     {
-        createTime = 1.0f;
+        createTime = 2.0f;
+        allowWhite = 90;
+        allowGrey = 180;
         score = 0;
         gameOver = false;
         paused = false;
@@ -111,31 +117,34 @@ public class Globals : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        // Dragging cubes downwards to speed up game also reduces cooldown between spawns
+        if (decreaseTimer >= 3) {
+            print(Globals.createTime);
+            createTime -= 0.005f;
+            decreaseTimer = 0;
+        }
+
         // Clear selected group if a cube in group is falling
         if (checkFall() && group.Count >= 3)
             clearGroup();
 
-        if (paused)
-        {
+        if (paused) {
             overlayRend.enabled = true;
             Time.timeScale = 0;
         }
-        else
-        {
+        else {
             overlayRend.enabled = false;
             Time.timeScale = 1;
         }
-
-        if (gameOver)
-        {
+        elapsedTime += Time.deltaTime;
+        if (gameOver) {
             endText.text = "Game Over \n Score: " + Globals.score;
             paused = true;
         }
 	}
 
     // Reduce time inbetween each cube spawn
-    IEnumerator reduceTime()
-    {
+    IEnumerator reduceTime() {
         yield return new WaitForSeconds(2.0f);
         if (createTime >= 0.5)
             createTime -= 0.005f;

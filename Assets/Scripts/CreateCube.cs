@@ -4,6 +4,7 @@ using System.Collections;
 public class CreateCube : MonoBehaviour {
 
     public GameObject cube;
+    private int chanceOfSpecial = 15;
     private int spawnX;
     private int prev;
     private Renderer rend;
@@ -16,7 +17,7 @@ public class CreateCube : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
+
 	}
 
     IEnumerator create()
@@ -31,9 +32,11 @@ public class CreateCube : MonoBehaviour {
         GameObject newCube = (GameObject)Instantiate(cube, newPos, Quaternion.identity);
 
         // Set cube's colour spawn type
-        int randInt = Random.Range(0, 7);
-        if (randInt == 0)
+        int randInt = Random.Range(0, chanceOfSpecial);
+        if (randInt == 0 && Globals.elapsedTime >= Globals.allowWhite)
             colour = new Color(1, 1, 1);
+        else if (randInt == 1 && Globals.elapsedTime >= Globals.allowGrey)
+            colour = new Color(0.5f, 0.5f, 0.5f);
         else {
             randInt = Random.Range(0, 6);
             if (randInt == 0)

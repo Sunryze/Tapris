@@ -14,12 +14,13 @@ public class CubeProperties : MonoBehaviour {
     public Material matSelected;
     private RaycastHit hit;
     private float size;
-    private float maxDrag = 0.6f;
+    private float maxDragX = 0.6f;
+    private float maxDragY = 0.08f;
     private float distance_to_screen;
     private float offsetX;
     private Vector3 currentPos;
     private int scoreInc;
-    private bool allowDrag;
+    private bool allowDragX, allowDragY;
 
 	// Use this for initialization
 	void Start () {
@@ -28,7 +29,8 @@ public class CubeProperties : MonoBehaviour {
 
     void OnMouseDown() {
         selected = true;
-        allowDrag = false;
+        allowDragX = false;
+        allowDragY = false;
         Globals.clearGroup();
         Globals.group.Add(transform.gameObject);
         prevPos = transform.position;
@@ -40,28 +42,28 @@ public class CubeProperties : MonoBehaviour {
         }
         distance_to_screen = Camera.main.WorldToScreenPoint(transform.position).z;
         Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-        if (fall)
-            offsetX = transform.position.x - temp_pos.x;
-        else
-            offsetX = 0;
+
+        offsetX = transform.position.x - temp_pos.x;
+
     }
 
 
     void OnMouseDrag() {
-        if(!Globals.paused) {
+        // Cubes can't be moved if game is paused or if cube is grey
+        if(!Globals.paused && colour != new Color(0.5f, 0.5f, 0.5f)) {
             Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-
 
             pos_move.x = pos_move.x + offsetX;
 
+            // Make sure object is dragged and not moved slightly
             if (Mathf.Abs(pos_move.x - prevPos.x) > 0.3f) {
-                allowDrag = true;
+                allowDragX = true;
             }
-            if (allowDrag) {
+            if (allowDragX) {
                 // Check if an object is blocking this cube to the left
                 // The +/- 0.01f is necessary to prevent collision detection when a cube is touching from above/below
-                Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f + offsetX, transform.position.z);
-                Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f + offsetX, transform.position.z);
+                Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f, transform.position.z);
+                Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f, transform.position.z);
                 if (Physics.Raycast(originU, Vector3.left, size) || Physics.Raycast(originD, Vector3.left, size))
                     dragLeft = false;
                 else
@@ -73,6 +75,15 @@ public class CubeProperties : MonoBehaviour {
                 else
                     dragRight = true;
 
+                // Prevent fast dragging from ignoring collision
+                // Raycast to see where objects are to the left and right
+                if(Physics.Raycast(originU, Vector3.left, out hit) || Physics.Raycast(originD, Vector3.left, out hit))
+                    if(pos_move.x < hit.transform.position.x)
+                        pos_move.x = hit.transform.position.x + 1;
+                if (Physics.Raycast(originU, Vector3.right, out hit) || Physics.Raycast(originD, Vector3.right, out hit))
+                    if (pos_move.x > hit.transform.position.x)
+                        pos_move.x = hit.transform.position.x - 1;
+
 
                 // Prevent dragging left or right if an object is blocking in that direction
                 if ((!dragLeft && pos_move.x <= transform.position.x) || (!dragRight && pos_move.x >= transform.position.x))
@@ -80,22 +91,42 @@ public class CubeProperties : MonoBehaviour {
 
                 // Clamp maximum left drag 
                 if (transform.position.x >= pos_move.x)
-                    if (transform.position.x - pos_move.x > maxDrag)
-                        pos_move.x = transform.position.x - maxDrag;
+                    if (transform.position.x - pos_move.x > maxDragX)
+                        pos_move.x = transform.position.x - maxDragX;
                 if (pos_move.x < 0)
                     pos_move.x = 0;
 
                 // Clamp maximum right drag
                 if (transform.position.x <= pos_move.x)
-                    if (pos_move.x - transform.position.x > maxDrag)
-                        pos_move.x = transform.position.x + maxDrag;
+                    if (pos_move.x - transform.position.x > maxDragX)
+                        pos_move.x = transform.position.x + maxDragX;
                 if (pos_move.x > 11)
                     pos_move.x = 11;
 
-                // Update to new adjusted position
-                transform.position = new Vector3(pos_move.x, transform.position.y, pos_move.z);
             }
+            if (Mathf.Abs(pos_move.y - prevPos.y) > 0.5) {
+                allowDragY = true;
+            }
+            prevPos.y = transform.position.y;
+            bool checkDown = Physics.Raycast(transform.position, Vector3.down, size*2);
+            if (checkDown) {
+                //print(allowDragY);
+                allowDragY = false;
+            }
+            
+            if (allowDragY) {
+                // Calculate y position movement
+                if (pos_move.y > transform.position.y)
+                    pos_move.y = transform.position.y;
+                if (transform.position.y - pos_move.y > maxDragY)
+                    pos_move.y = transform.position.y - maxDragY;
+                Globals.decreaseTimer += Time.fixedDeltaTime;
+            }
+            else
+                pos_move.y = transform.position.y;
 
+            // Update to new adjusted position
+            transform.position = new Vector3(pos_move.x, pos_move.y, pos_move.z);
         }
         
     }
