@@ -4,7 +4,7 @@ using System.Collections;
 public class CreateCube : MonoBehaviour {
 
     public GameObject cube;
-    private int chanceOfSpecial = 15;
+    private int chanceOfSpecial = 18;       // 1 in 'chanceOfSpecial'
     private int spawnX;
     private int prev;
     private Renderer rend;

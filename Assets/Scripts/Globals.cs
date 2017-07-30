@@ -7,12 +7,10 @@ public class Globals : MonoBehaviour {
     public static bool gameOver, paused;
     public static int score;
     public static float elapsedTime;    // Game time in seconds, not counting pause
-    public static float fallSpeed;
     public static float createTime, decreaseTimer;
     public static float allowWhite, allowGrey;
-    public Text endText;
     public static ArrayList group;
-    public static ArrayList pos;
+    public Text endText;
     public GameObject pauseOverlay;
     private Renderer overlayRend;
     private Vector2 pressPosInit;
@@ -27,13 +25,14 @@ public class Globals : MonoBehaviour {
     protected void Awake()
     {
         createTime = 2.0f;
+        decreaseTimer = 0;
+        elapsedTime = 0;
         allowWhite = 90;
         allowGrey = 180;
         score = 0;
         gameOver = false;
         paused = false;
         group = new ArrayList();
-        pos = new ArrayList();
         pauseOverlay = GameObject.FindGameObjectWithTag("overlay");
         Material mat = pauseOverlay.GetComponent<Renderer>().material;
         mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, 0.5f);
@@ -54,7 +53,6 @@ public class Globals : MonoBehaviour {
         foreach (GameObject cube in group)
             cube.GetComponent<CubeProperties>().selected = false;
         group.Clear();
-        pos.Clear();
     }
 
     // Set the previous position of all selected cubes to be their current position
@@ -119,7 +117,6 @@ public class Globals : MonoBehaviour {
     void Update () {
         // Dragging cubes downwards to speed up game also reduces cooldown between spawns
         if (decreaseTimer >= 3) {
-            print(Globals.createTime);
             createTime -= 0.005f;
             decreaseTimer = 0;
         }

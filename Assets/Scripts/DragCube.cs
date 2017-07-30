@@ -72,7 +72,7 @@ public class DragCube : MonoBehaviour {
 
             // Update y value
             if (prop.fall)
-                update.y = target.position.y - Globals.fallSpeed * Time.fixedDeltaTime;
+                update.y = target.position.y - prop.fallSpeed * Time.fixedDeltaTime;
 
             // Update to new position
             target.position = update + offset;

@@ -54,7 +54,6 @@ public class CubeProperties : MonoBehaviour {
             Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
 
             pos_move.x = pos_move.x + offsetX;
-
             // Make sure object is dragged and not moved slightly
             if (Mathf.Abs(pos_move.x - prevPos.x) > 0.3f) {
                 allowDragX = true;
@@ -77,8 +76,8 @@ public class CubeProperties : MonoBehaviour {
 
                 // Prevent fast dragging from ignoring collision
                 // Raycast to see where objects are to the left and right
-                if(Physics.Raycast(originU, Vector3.left, out hit) || Physics.Raycast(originD, Vector3.left, out hit))
-                    if(pos_move.x < hit.transform.position.x)
+                if (Physics.Raycast(originU, Vector3.left, out hit) || Physics.Raycast(originD, Vector3.left, out hit))
+                    if (pos_move.x < hit.transform.position.x)
                         pos_move.x = hit.transform.position.x + 1;
                 if (Physics.Raycast(originU, Vector3.right, out hit) || Physics.Raycast(originD, Vector3.right, out hit))
                     if (pos_move.x > hit.transform.position.x)
@@ -102,8 +101,9 @@ public class CubeProperties : MonoBehaviour {
                         pos_move.x = transform.position.x + maxDragX;
                 if (pos_move.x > 11)
                     pos_move.x = 11;
-
             }
+            else
+                pos_move.x = transform.position.x;
             if (Mathf.Abs(pos_move.y - prevPos.y) > 0.5) {
                 allowDragY = true;
             }
