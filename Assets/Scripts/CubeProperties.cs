@@ -177,7 +177,7 @@ public class CubeProperties : MonoBehaviour {
                 else if (hit.transform.tag == "Cube") { 
                     if (!hit.transform.GetComponent<CubeProperties>().fall) {
                         transform.position = new Vector3(transform.position.x, Mathf.Round(transform.position.y), transform.position.z);
-                        checkBomb();
+                        checkBomb();  
                     }
                 }
             }
@@ -208,7 +208,7 @@ public class CubeProperties : MonoBehaviour {
                 transform.Translate(Vector3.down * Time.fixedDeltaTime * fallSpeed);
 
             // End the game if an object has stopped falling above the field
-            if (!fall && transform.position.y >= 9)
+            if (!fall && transform.position.y >= 10)
                 Globals.gameOver = true;
 
             // Prevent cube from going out of bounds
@@ -254,7 +254,8 @@ public class CubeProperties : MonoBehaviour {
     void destroyCube(Vector3 dir) {
         if (Physics.Raycast(transform.position, dir, out hit, size * 2)) {
             if (hit.transform.tag == "Cube") {
-                print(hit.transform.GetComponent<CubeProperties>().colour);
+                if (hit.transform.GetComponent<CubeProperties>().selected)
+                    Globals.clearGroup();
                 Destroy(hit.transform.gameObject);
                 Globals.score++;
             }

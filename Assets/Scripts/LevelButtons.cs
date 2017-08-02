@@ -16,16 +16,15 @@ public class LevelButtons : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape)) {
             if (buffer)
                 Application.Quit();
-            else
-            {
+            else {
                 AndroidNativeFunctions.ShowToast("Press again to exit");
                 buffer = true;
                 StartCoroutine(bufferTime());
             }
-
+        }
     }
 
     // Reload the game scene to restart level

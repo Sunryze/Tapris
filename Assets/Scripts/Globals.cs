@@ -6,6 +6,7 @@ public class Globals : MonoBehaviour {
 
     public static bool gameOver, paused;
     public static int score;
+    public static int highScore;
     public static float elapsedTime;    // Game time in seconds, not counting pause
     public static float createTime, decreaseTimer;
     public static float allowWhite, allowGrey;
@@ -27,11 +28,12 @@ public class Globals : MonoBehaviour {
         createTime = 2.0f;
         decreaseTimer = 0;
         elapsedTime = 0;
-        allowWhite = 90;
-        allowGrey = 180;
+        allowWhite = 1;
+        allowGrey = 1;
         score = 0;
         gameOver = false;
         paused = false;
+        highScore = PlayerPrefs.GetInt("highScore", highScore);
         group = new ArrayList();
         pauseOverlay = GameObject.FindGameObjectWithTag("overlay");
         Material mat = pauseOverlay.GetComponent<Renderer>().material;
@@ -135,10 +137,20 @@ public class Globals : MonoBehaviour {
         }
         elapsedTime += Time.deltaTime;
         if (gameOver) {
-            endText.text = "Game Over \n Score: " + Globals.score;
+            endText.text = "Game Over \n Score: " + score;
+            if (score > highScore) {
+                highScore = score;
+                PlayerPrefs.SetInt("highScore", highScore);
+            }
             paused = true;
         }
 	}
+
+    // Detect if app state is in the background
+    void OnApplicationFocus(bool status) {
+        if (!status)
+            paused = true;
+    }
 
     // Reduce time inbetween each cube spawn
     IEnumerator reduceTime() {
