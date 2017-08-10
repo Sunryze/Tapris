@@ -26,8 +26,8 @@ public class CreateCube : MonoBehaviour {
         Color colour;
         // Prevent cube from spawning in same location twice
         while (spawnX == prev)
-            spawnX = Random.Range(1, 10);
-        Vector3 newPos = new Vector3(spawnX, 14, 0);
+            spawnX = Random.Range(-1, 12);
+        Vector3 newPos = new Vector3(spawnX, 13, 0);
         prev = spawnX;
         GameObject newCube = (GameObject)Instantiate(cube, newPos, Quaternion.identity);
 

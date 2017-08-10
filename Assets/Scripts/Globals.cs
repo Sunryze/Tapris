@@ -10,9 +10,12 @@ public class Globals : MonoBehaviour {
     public static float elapsedTime;    // Game time in seconds, not counting pause
     public static float createTime, decreaseTimer;
     public static float allowWhite, allowGrey;
+    public static int warningThreshold;
     public static ArrayList group;
     public Text endText;
     public GameObject pauseOverlay;
+    public Material warningMat;
+    private Color warningColour = Color.black;
     private Renderer overlayRend;
     private Vector2 pressPosInit;
     private Vector2 pressPosEnd;
@@ -28,11 +31,13 @@ public class Globals : MonoBehaviour {
         createTime = 2.0f;
         decreaseTimer = 0;
         elapsedTime = 0;
-        allowWhite = 1;
-        allowGrey = 1;
+        warningThreshold = 6;
+        allowWhite = 150;   // Time until white and grey blocks begin spawning
+        allowGrey = 60;
         score = 0;
         gameOver = false;
         paused = false;
+        //wireFrame = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Wireframe.prefab");
         highScore = PlayerPrefs.GetInt("highScore", highScore);
         group = new ArrayList();
         pauseOverlay = GameObject.FindGameObjectWithTag("overlay");
@@ -46,7 +51,7 @@ public class Globals : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+
 	}
 
     // Unselect all cubes in the group and remove them from the arraylist
@@ -144,6 +149,10 @@ public class Globals : MonoBehaviour {
             }
             paused = true;
         }
+
+        // Continiously Lerp the colour of warning frame between black and red
+        warningColour = Color.Lerp(Color.black, Color.white, Mathf.PingPong(Time.time, 1));
+        warningMat.color = warningColour;
 	}
 
     // Detect if app state is in the background

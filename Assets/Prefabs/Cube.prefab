@@ -241,8 +241,12 @@ MonoBehaviour:
   dragLeft: 0
   dragRight: 0
   selected: 0
+  warning: 0
   fallSpeed: 2
+  menuCube: 0
+  wireFrame: {fileID: 1000013477881000, guid: cabc60b8c92a6cc4c9c41e9b2070cd31, type: 2}
   prevPos: {x: 0, y: 0, z: 0}
   colour: {r: 0, g: 0, b: 0, a: 0}
   mat: {fileID: 2100000, guid: f37fdda88d1ac6848b8713a51ecb7695, type: 2}
   matSelected: {fileID: 2100000, guid: b5f12fbb55ee0484aacd93e4debeeec1, type: 2}
+  matWarning: {fileID: 2100000, guid: a905228af3af74e469fb268b49b20796, type: 2}

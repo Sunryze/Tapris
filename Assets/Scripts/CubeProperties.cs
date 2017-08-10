@@ -6,12 +6,15 @@ public class CubeProperties : MonoBehaviour {
     public bool draggable = true;
     public bool fall = true;
     public bool dragLeft, dragRight;
-    public bool selected;
+    public bool selected, warning;
     public float fallSpeed = 2;
+    public bool menuCube = false;
+    public GameObject wireFrame;
     public Vector3 prevPos;
     public Color colour;
     public Material mat;
     public Material matSelected;
+    public Material matWarning;
     private RaycastHit hit;
     private float size;
     private float maxDragX = 0.6f;
@@ -28,29 +31,32 @@ public class CubeProperties : MonoBehaviour {
 	}
 
     void OnMouseDown() {
-        selected = true;
-        allowDragX = false;
-        allowDragY = false;
-        Globals.clearGroup();
-        Globals.group.Add(transform.gameObject);
-        prevPos = transform.position;
-        if (!fall) {
-            selectAdj(Vector3.left);
-            selectAdj(Vector3.right);
-            selectAdj(Vector3.up);
-            selectAdj(Vector3.down);
+        if (!Globals.paused && !Globals.gameOver) {
+            selected = true;
+            allowDragX = false;
+            allowDragY = false;
+            prevPos = transform.position;
+            // Clear previous selections and select this cube
+            Globals.clearGroup();
+            Globals.group.Add(transform.gameObject);
+            // Select all connected cubes if this one isn't falling
+            if (!fall) {
+                selectAdj(Vector3.left);
+                selectAdj(Vector3.right);
+                selectAdj(Vector3.up);
+                selectAdj(Vector3.down);
+            }
+            distance_to_screen = Camera.main.WorldToScreenPoint(transform.position).z;
+            Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
+
+            offsetX = transform.position.x - temp_pos.x;
         }
-        distance_to_screen = Camera.main.WorldToScreenPoint(transform.position).z;
-        Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-
-        offsetX = transform.position.x - temp_pos.x;
-
     }
 
 
     void OnMouseDrag() {
         // Cubes can't be moved if game is paused or if cube is grey
-        if(!Globals.paused && colour != new Color(0.5f, 0.5f, 0.5f)) {
+        if(!Globals.paused && !Globals.gameOver && colour != new Color(0.5f, 0.5f, 0.5f)) {
             Vector3 pos_move = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
 
             pos_move.x = pos_move.x + offsetX;
@@ -184,6 +190,26 @@ public class CubeProperties : MonoBehaviour {
             else
                 fall = true;
 
+
+            warning = false;
+            // If there is an object below this one that is positioned over the threshold
+            // then set the cube with a warning property
+            if (Physics.Raycast(transform.position, Vector3.down, out hit)) {
+                if (hit.transform.tag == "Cube")
+                    if (hit.transform.position.y >= Globals.warningThreshold && !hit.transform.GetComponent<CubeProperties>().fall)
+                        warning = true;
+            }
+            // Check if any cube above this one is positioned over the threshold and set warning
+            RaycastHit[] targets = Physics.RaycastAll(transform.position, Vector3.up);
+            if(targets.Length > 0) {
+                foreach (RaycastHit h in targets) {
+                    if (h.transform.tag == "Cube")
+                        if (h.transform.position.y > Globals.warningThreshold && !h.transform.GetComponent<CubeProperties>().fall)
+                            warning = true;
+                }
+            }
+            
+
             Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f, transform.position.z);
             Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f, transform.position.z);
 
@@ -208,7 +234,7 @@ public class CubeProperties : MonoBehaviour {
                 transform.Translate(Vector3.down * Time.fixedDeltaTime * fallSpeed);
 
             // End the game if an object has stopped falling above the field
-            if (!fall && transform.position.y >= 10)
+            if (!fall && transform.position.y >= 9)
                 Globals.gameOver = true;
 
             // Prevent cube from going out of bounds
@@ -218,13 +244,22 @@ public class CubeProperties : MonoBehaviour {
                 transform.position = new Vector3(10, transform.position.y, transform.position.z);
 
             // Change this cube's frame colour
-            if (selected)
+            if (warning)
+                transform.GetChild(0).GetComponent<Renderer>().material = matWarning;
+            else if (selected)
                 transform.GetChild(0).GetComponent<Renderer>().material = matSelected;
             else
                 transform.GetChild(0).GetComponent<Renderer>().material = mat;
         }
-        
+
+        // Cubes spawned in menu
+        if(menuCube) {
+            transform.GetChild(0).GetComponent<Renderer>().material = matSelected;
+            if (transform.position.y <= -11)
+                Destroy(transform.gameObject);
+        }   
 	}
+
 
     // Select any cubes that are adjacent to the current one in 3 directions (excluding the previous one)
     // Uses recursion to add each cube to the global group
@@ -289,6 +324,10 @@ public class CubeProperties : MonoBehaviour {
             if (Globals.group.Contains(gameObject))
                 Globals.clearGroup();
             Globals.score++;
+
+            // Create an expanding frame on destroy
+            Instantiate(wireFrame, transform.position, Quaternion.identity);
+
             Destroy(gameObject);
         }
     }

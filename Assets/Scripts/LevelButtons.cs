@@ -7,11 +7,12 @@ public class LevelButtons : MonoBehaviour {
 
     public Button pauseBtn;
     public Sprite resumeSprite;
+    public Text helpText;
     private bool buffer;
 
     // Use this for initialization
     void Start () {
-	
+
 	}
 	
 	// Update is called once per frame
@@ -24,6 +25,10 @@ public class LevelButtons : MonoBehaviour {
                 buffer = true;
                 StartCoroutine(bufferTime());
             }
+        }
+        if(Input.touches.Length > 1) {
+            Globals.paused = false;
+            pauseBtn.image.overrideSprite = null;
         }
     }
 
@@ -44,6 +49,20 @@ public class LevelButtons : MonoBehaviour {
         else
         {
             Globals.paused = false;
+            pauseBtn.image.overrideSprite = null;
+            helpText.GetComponent<Text>().enabled = false;
+        }
+    }
+
+    public void help() {
+        if (!Globals.paused) {
+            Globals.paused = true;
+            helpText.GetComponent<Text>().enabled = true;
+            pauseBtn.image.overrideSprite = resumeSprite;
+        }
+        else {
+            Globals.paused = false;
+            helpText.GetComponent<Text>().enabled = false;
             pauseBtn.image.overrideSprite = null;
         }
     }

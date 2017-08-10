@@ -102,7 +102,7 @@ PlayerSettings:
   singlePassStereoRendering: 0
   protectGraphicsMemory: 0
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 9
+  AndroidMinSdkVersion: 14
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   apiCompatibilityLevel: 2
@@ -165,7 +165,7 @@ PlayerSettings:
   AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: 
+  AndroidKeystoreName: D:/Unity/Projects/Tapris/tapris.keystore
   AndroidKeyaliasName: 
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
@@ -520,6 +520,6 @@ PlayerSettings:
   iOS::VR::enabledDevices: []
   tvOS::VR::enabledDevices: []
   cloudProjectId: 05b53c6c-e1b0-44a6-bf91-ada480bb54d5
-  projectName: CubeXCube
+  projectName: Tapris
   organizationId: sunny-3986783
   cloudEnabled: 0

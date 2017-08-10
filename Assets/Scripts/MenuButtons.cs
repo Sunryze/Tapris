@@ -8,11 +8,13 @@ public class MenuButtons : MonoBehaviour {
     private bool buffer;
     public int highScore;
     public GameObject scoreText;
+    public GameObject overlay;
 
 	// Use this for initialization
 	void Start () {
         highScore = PlayerPrefs.GetInt("highScore", highScore);
         scoreText.GetComponent<Text>().text = "Highscore: " + highScore;
+        overlay.GetComponent<Renderer>().material.color = new Color(0.5f, 0.5f, 0.5f, 0.85f);
 	}
 
     public void startGame()
