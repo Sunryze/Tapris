@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "543315670363",
+    "firebase_url": "https://tapris-a9d97.firebaseio.com",
+    "project_id": "tapris-a9d97",
+    "storage_bucket": "tapris-a9d97.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543315670363:android:7000cd628ddede53",
+        "android_client_info": {
+          "package_name": "com.Sunryze.Tapris"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "543315670363-v5hktccs2sbbvn213ur3bhopf2nun0t2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeWCEkt8ws2qLaj1TlbkPluAEIEISBEiI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

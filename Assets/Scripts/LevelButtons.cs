@@ -8,6 +8,7 @@ public class LevelButtons : MonoBehaviour {
     public Button pauseBtn;
     public Sprite resumeSprite;
     public Text helpText;
+    public GameObject admob;
     private bool buffer;
 
     // Use this for initialization
@@ -30,11 +31,16 @@ public class LevelButtons : MonoBehaviour {
             Globals.paused = false;
             pauseBtn.image.overrideSprite = null;
         }
+        if(Globals.paused)
+            pauseBtn.image.overrideSprite = resumeSprite;
+        else
+            pauseBtn.image.overrideSprite = null;
     }
 
     // Reload the game scene to restart level
     public void restartLevel()
     {
+        
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -43,13 +49,14 @@ public class LevelButtons : MonoBehaviour {
         if (!Globals.paused)
         {
             Globals.paused = true;
-            pauseBtn.image.overrideSprite = resumeSprite;
+            
+            //admob.GetComponent<AdManager>().playAd();
         }
 
         else
         {
             Globals.paused = false;
-            pauseBtn.image.overrideSprite = null;
+            
             helpText.GetComponent<Text>().enabled = false;
         }
     }
@@ -58,12 +65,10 @@ public class LevelButtons : MonoBehaviour {
         if (!Globals.paused) {
             Globals.paused = true;
             helpText.GetComponent<Text>().enabled = true;
-            pauseBtn.image.overrideSprite = resumeSprite;
         }
         else {
             Globals.paused = false;
             helpText.GetComponent<Text>().enabled = false;
-            pauseBtn.image.overrideSprite = null;
         }
     }
 

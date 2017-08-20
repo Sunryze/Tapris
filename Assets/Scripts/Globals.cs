@@ -14,6 +14,7 @@ public class Globals : MonoBehaviour {
     public static ArrayList group;
     public Text endText;
     public GameObject pauseOverlay;
+    public GameObject retryBtn;
     public Material warningMat;
     private Color warningColour = Color.black;
     private Renderer overlayRend;
@@ -148,6 +149,7 @@ public class Globals : MonoBehaviour {
                 PlayerPrefs.SetInt("highScore", highScore);
             }
             paused = true;
+            retryBtn.SetActive(true);
         }
 
         // Continiously Lerp the colour of warning frame between black and red
