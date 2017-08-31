@@ -9,6 +9,11 @@ public class CubeProperties : MonoBehaviour {
     public bool selected, warning;
     public float fallSpeed = 2;
     public bool menuCube = false;
+    public float distance_to_screen;
+    public float offsetX;
+    public Vector3 currentPos;
+    public int scoreInc;
+    public bool allowDragX, allowDragY;
     public GameObject wireFrame;
     public Vector3 prevPos;
     public Color colour;
@@ -19,18 +24,13 @@ public class CubeProperties : MonoBehaviour {
     private float size;
     private float maxDragX = 0.6f;
     private float maxDragY = 0.08f;
-    private float distance_to_screen;
-    private float offsetX;
-    private Vector3 currentPos;
-    private int scoreInc;
-    private bool allowDragX, allowDragY;
-
+    
 	// Use this for initialization
 	void Start () {
         size = transform.localScale.x/2;
 	}
 
-    void OnMouseDown() {
+    /*void OnMouseDown() {
         if (!Globals.paused && !Globals.gameOver) {
             selected = true;
             allowDragX = false;
@@ -80,15 +80,16 @@ public class CubeProperties : MonoBehaviour {
                 else
                     dragRight = true;
 
-                // Prevent fast dragging from ignoring collision
+                
                 // Raycast to see where objects are to the left and right
+                // Prevent fast dragging from ignoring collision
                 if (Physics.Raycast(originU, Vector3.left, out hit) || Physics.Raycast(originD, Vector3.left, out hit))
                     if (pos_move.x < hit.transform.position.x)
                         pos_move.x = hit.transform.position.x + 1;
                 if (Physics.Raycast(originU, Vector3.right, out hit) || Physics.Raycast(originD, Vector3.right, out hit))
                     if (pos_move.x > hit.transform.position.x)
                         pos_move.x = hit.transform.position.x - 1;
-
+                
 
                 // Prevent dragging left or right if an object is blocking in that direction
                 if ((!dragLeft && pos_move.x <= transform.position.x) || (!dragRight && pos_move.x >= transform.position.x))
@@ -98,18 +99,20 @@ public class CubeProperties : MonoBehaviour {
                 if (transform.position.x >= pos_move.x)
                     if (transform.position.x - pos_move.x > maxDragX)
                         pos_move.x = transform.position.x - maxDragX;
-                if (pos_move.x < 0)
+                if (pos_move.x <= 0)
                     pos_move.x = 0;
 
                 // Clamp maximum right drag
                 if (transform.position.x <= pos_move.x)
                     if (pos_move.x - transform.position.x > maxDragX)
                         pos_move.x = transform.position.x + maxDragX;
-                if (pos_move.x > 11)
+                if (pos_move.x >= 11)
                     pos_move.x = 11;
             }
             else
                 pos_move.x = transform.position.x;
+
+
             if (Mathf.Abs(pos_move.y - prevPos.y) > 0.5) {
                 allowDragY = true;
             }
@@ -163,7 +166,7 @@ public class CubeProperties : MonoBehaviour {
         transform.position = new Vector3(Mathf.Round(transform.position.x), transform.position.y, transform.position.z);
 
     }
-
+    */
     // Update is called once per frame
     void FixedUpdate() {
         if(!Globals.paused) {

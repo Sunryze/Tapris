@@ -11,6 +11,7 @@ public class Globals : MonoBehaviour {
     public static float createTime, decreaseTimer;
     public static float allowWhite, allowGrey;
     public static int warningThreshold;
+    public static float cubeSize;
     public static ArrayList group;
     public Text endText;
     public GameObject pauseOverlay;
@@ -35,6 +36,7 @@ public class Globals : MonoBehaviour {
         warningThreshold = 6;
         allowWhite = 150;   // Time until white and grey blocks begin spawning
         allowGrey = 60;
+        cubeSize = 0.5f;
         score = 0;
         gameOver = false;
         paused = false;

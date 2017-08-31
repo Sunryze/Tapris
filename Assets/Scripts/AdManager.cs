@@ -20,16 +20,17 @@ public class AdManager : MonoBehaviour {
     private void RequestBanner() {
         #if UNITY_EDITOR
             string adUnitId = "ca-app-pub-2593585099025338/6902847482";
-        #elif UNITY_ANDROID
+#elif UNITY_ANDROID
             string adUnitId = "ca-app-pub-2593585099025338/6902847482";
-        #elif UNITY_IPHONE
+#elif UNITY_IPHONE
             string adUnitId = "INSERT_IOS_BANNER_AD_UNIT_ID_HERE";
-        #else
+#else
             string adUnitId = "unexpected_platform";
-        #endif
+#endif
 
         // Create a 320x50 at location
-        banner = new BannerView(adUnitId, AdSize.Banner, AdPosition.Bottom);
+        AdSize adSize = new AdSize(360, 50);
+        banner = new BannerView(adUnitId, adSize, AdPosition.Bottom);
 
         // Test Ad
         /*
