@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Globals : MonoBehaviour {
 
+    public const float SCORE_DURATION = 1.0f;
+
     public static bool gameOver, paused;
     public static int score;
     public static int highScore;
@@ -13,16 +15,18 @@ public class Globals : MonoBehaviour {
     public static int warningThreshold;
     public static float cubeSize;
     public static ArrayList group;
-    public Text endText;
-    public GameObject pauseOverlay;
-    public GameObject retryBtn;
-    public Material warningMat;
-    private Color warningColour = Color.black;
-    private Renderer overlayRend;
+
+    [SerializeField] private Text endText;
+    [SerializeField] private GameObject pauseOverlay;
+    [SerializeField] private GameObject retryBtn;
+    [SerializeField] private Material warningMat;
+    [SerializeField] private Color warningColour = Color.black;
+    [SerializeField] private Renderer overlayRend;
+    [SerializeField] private float minSwipeLength = 100f;
+
     private Vector2 pressPosInit;
     private Vector2 pressPosEnd;
     private Vector3 currentSwipe;
-    private float minSwipeLength = 100f;
     private Ray ray;
     private RaycastHit hit;
     
@@ -34,31 +38,23 @@ public class Globals : MonoBehaviour {
         decreaseTimer = 0;
         elapsedTime = 0;
         warningThreshold = 6;
-        allowWhite = 150;   // Time until white and grey blocks begin spawning
-        allowGrey = 60;
+        allowWhite = 120;   // Time until white and grey blocks begin spawning
+        allowGrey = 50;
         cubeSize = 0.5f;
         score = 0;
         gameOver = false;
         paused = false;
-        //wireFrame = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Wireframe.prefab");
         highScore = PlayerPrefs.GetInt("highScore", highScore);
         group = new ArrayList();
-        pauseOverlay = GameObject.FindGameObjectWithTag("overlay");
         Material mat = pauseOverlay.GetComponent<Renderer>().material;
         mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, 0.5f);
-        overlayRend = pauseOverlay.GetComponent<Renderer>();
         overlayRend.enabled = false;
         endText.text = null;
-        StartCoroutine(reduceTime());
+        StartCoroutine(ReduceTime());
     }
 
-	// Use this for initialization
-	void Start () {
-
-	}
-
     // Unselect all cubes in the group and remove them from the arraylist
-    public static void clearGroup()
+    public static void ClearGroup()
     {
         foreach (GameObject cube in group)
             cube.GetComponent<CubeProperties>().selected = false;
@@ -66,7 +62,7 @@ public class Globals : MonoBehaviour {
     }
 
     // Set the previous position of all selected cubes to be their current position
-    public static void setPos()
+    public static void SetPos()
     {
         foreach (GameObject cube in group)
             cube.GetComponent<CubeProperties>().prevPos = cube.transform.position;
@@ -74,7 +70,7 @@ public class Globals : MonoBehaviour {
 
     // Compare if the current position of all cubes in the group are the same as their previous position
     // Return false if a cube has moved
-    public static bool checkPos()
+    public static bool CheckPos()
     {
         foreach (GameObject cube in group)
             if (cube.GetComponent<CubeProperties>().prevPos != cube.transform.position)
@@ -84,7 +80,7 @@ public class Globals : MonoBehaviour {
 
     // Check to see if any cube in the selected group is falling
     // Return true if any are falling
-    private bool checkFall()
+    private bool CheckFall()
     {
         foreach (GameObject cube in group)
             if (cube.GetComponent<CubeProperties>().fall)
@@ -93,7 +89,7 @@ public class Globals : MonoBehaviour {
     }
 
     // Swipe down to increase fall speed
-    void swipe() {
+    void Swipe() {
         if (Input.touches.Length > 0) {
             Touch t = Input.GetTouch(0);
             Ray ray = Camera.main.ScreenPointToRay(t.position);
@@ -132,8 +128,8 @@ public class Globals : MonoBehaviour {
         }
 
         // Clear selected group if a cube in group is falling
-        if (checkFall() && group.Count >= 3)
-            clearGroup();
+        if (CheckFall() && group.Count >= 3)
+            ClearGroup();
 
         if (paused) {
             overlayRend.enabled = true;
@@ -155,8 +151,9 @@ public class Globals : MonoBehaviour {
         }
 
         // Continiously Lerp the colour of warning frame between black and red
-        warningColour = Color.Lerp(Color.black, Color.white, Mathf.PingPong(Time.time, 1));
-        warningMat.color = warningColour;
+         warningColour = Color.Lerp(Color.black, Color.white, Mathf.PingPong(Time.time, 1));
+         warningMat.color = warningColour;
+
 	}
 
     // Detect if app state is in the background
@@ -165,11 +162,11 @@ public class Globals : MonoBehaviour {
             paused = true;
     }
 
-    // Reduce time inbetween each cube spawn
-    IEnumerator reduceTime() {
+    // Reduce time in between each cube spawn
+    IEnumerator ReduceTime() {
         yield return new WaitForSeconds(2.0f);
-        if (createTime >= 0.5)
+        if (createTime >= 0.6)
             createTime -= 0.005f;
-        StartCoroutine(reduceTime());
+        StartCoroutine(ReduceTime());
     }
 }

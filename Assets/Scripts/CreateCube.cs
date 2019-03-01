@@ -3,16 +3,16 @@ using System.Collections;
 
 public class CreateCube : MonoBehaviour {
 
-    public GameObject cube;
-    private int chanceOfSpecial = 20;       // 1 in 'chanceOfSpecial'
-    private int spawnX;
+    [SerializeField] private GameObject cube;
+    [SerializeField] private int chanceOfSpecial = 20;       // 1 in 'chanceOfSpecial'
+    [SerializeField] private int spawnX;
     private int prev;
     private Renderer rend;
 
 
 	// Use this for initialization
 	void Start () {
-        StartCoroutine(create());
+        StartCoroutine(Create());
     }
 	
 	// Update is called once per frame
@@ -20,7 +20,7 @@ public class CreateCube : MonoBehaviour {
 
 	}
 
-    IEnumerator create()
+    IEnumerator Create()
     {
         yield return new WaitForSeconds(Globals.createTime);
         Color colour;
@@ -57,6 +57,6 @@ public class CreateCube : MonoBehaviour {
         newCube.GetComponent<CubeProperties>().colour = colour;
 
         if (!Globals.gameOver)
-            StartCoroutine(create());
+            StartCoroutine(Create());
     }
 }

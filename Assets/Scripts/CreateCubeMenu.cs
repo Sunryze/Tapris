@@ -3,15 +3,15 @@ using System.Collections;
 
 public class CreateCubeMenu : MonoBehaviour {
 
-    public GameObject cube;
-    private int spawnX;
+    [SerializeField] private GameObject cube;
+    [SerializeField] private int spawnX;
     private int prev;
     private Renderer rend;
 
 
 	// Use this for initialization
 	void Start () {
-        StartCoroutine(create());
+        StartCoroutine(Create());
     }
 	
 	// Update is called once per frame
@@ -19,7 +19,7 @@ public class CreateCubeMenu : MonoBehaviour {
 
 	}
 
-    IEnumerator create()
+    IEnumerator Create()
     {
         yield return new WaitForSeconds(3);
         Color colour;
@@ -49,6 +49,6 @@ public class CreateCubeMenu : MonoBehaviour {
         rend.material.color = colour;
         newCube.GetComponent<CubeProperties>().colour = colour;
         newCube.GetComponent<CubeProperties>().menuCube = true;
-        StartCoroutine(create());
+        StartCoroutine(Create());
     }
 }

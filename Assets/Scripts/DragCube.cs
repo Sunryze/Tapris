@@ -7,14 +7,14 @@ using System.Collections;
 
 public class DragCube : MonoBehaviour {
 
+    [SerializeField] private float maxDragX = 0.5f;
+    [SerializeField] private float maxDragY = 0.08f;
     private float distance;
     private bool dragging;
     private Vector3 offset;
     private Transform target;
     private RaycastHit hit;
     private CubeProperties cube;
-    private float maxDragX = 0.5f;
-    private float maxDragY = 0.08f;
     private int scoreInc;
 
 
@@ -45,14 +45,14 @@ public class DragCube : MonoBehaviour {
                     cube.allowDragY = false;
                     cube.prevPos = target.position;
                     // Clear previous selections and select this cube
-                    Globals.clearGroup();
+                    Globals.ClearGroup();
                     Globals.group.Add(target.gameObject);
                     // Select all connected cubes if this one isn't falling
                     if (!cube.fall) {
-                        cube.selectAdj(Vector3.left);
-                        cube.selectAdj(Vector3.right);
-                        cube.selectAdj(Vector3.up);
-                        cube.selectAdj(Vector3.down);
+                        cube.SelectAdj(Vector3.left);
+                        cube.SelectAdj(Vector3.right);
+                        cube.SelectAdj(Vector3.up);
+                        cube.SelectAdj(Vector3.down);
                     }
                     cube.distance_to_screen = Camera.main.WorldToScreenPoint(target.position).z;
                     Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, cube.distance_to_screen));
@@ -149,7 +149,7 @@ public class DragCube : MonoBehaviour {
             if (dragging && (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)) {
                 Debug.Log("release");
                 if (target.position != cube.prevPos)
-                    Globals.clearGroup();
+                    Globals.ClearGroup();
                 Ray ray = Camera.main.ScreenPointToRay(touch.position);
                 if (Physics.Raycast(ray, out hit, 10)) {
                     if (hit.transform.tag == "Cube") {
@@ -167,7 +167,7 @@ public class DragCube : MonoBehaviour {
                         }
                     }
                 }
-                Globals.clearGroup();
+                Globals.ClearGroup();
                 target.position = new Vector3(Mathf.Round(target.position.x), target.position.y, target.position.z);
                 dragging = false;
                

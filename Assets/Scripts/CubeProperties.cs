@@ -11,8 +11,7 @@ public class CubeProperties : MonoBehaviour {
     public bool menuCube = false;
     public float distance_to_screen;
     public float offsetX;
-    public Vector3 currentPos;
-    public int scoreInc;
+    public Vector3 currentPos; 
     public bool allowDragX, allowDragY;
     public GameObject wireFrame;
     public Vector3 prevPos;
@@ -20,7 +19,12 @@ public class CubeProperties : MonoBehaviour {
     public Material mat;
     public Material matSelected;
     public Material matWarning;
+
+    [SerializeField] private GameObject scoreText;
+    [SerializeField] private float scoreDistance;
+
     private RaycastHit hit;
+    private int scoreInc;
     private float size;
     private float maxDragX = 0.6f;
     private float maxDragY = 0.08f;
@@ -30,21 +34,21 @@ public class CubeProperties : MonoBehaviour {
         size = transform.localScale.x/2;
 	}
 
-    /*void OnMouseDown() {
+    void OnMouseDown() {
         if (!Globals.paused && !Globals.gameOver) {
             selected = true;
             allowDragX = false;
             allowDragY = false;
             prevPos = transform.position;
             // Clear previous selections and select this cube
-            Globals.clearGroup();
+            Globals.ClearGroup();
             Globals.group.Add(transform.gameObject);
             // Select all connected cubes if this one isn't falling
             if (!fall) {
-                selectAdj(Vector3.left);
-                selectAdj(Vector3.right);
-                selectAdj(Vector3.up);
-                selectAdj(Vector3.down);
+                SelectAdj(Vector3.left);
+                SelectAdj(Vector3.right);
+                SelectAdj(Vector3.up);
+                SelectAdj(Vector3.down);
             }
             distance_to_screen = Camera.main.WorldToScreenPoint(transform.position).z;
             Vector3 temp_pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
@@ -142,7 +146,7 @@ public class CubeProperties : MonoBehaviour {
 
     void OnMouseUp() {
         if (transform.position != prevPos)
-            Globals.clearGroup();
+            Globals.ClearGroup();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, 10)) {
             if (hit.transform.tag == "Cube") {
@@ -156,17 +160,18 @@ public class CubeProperties : MonoBehaviour {
                         }
                         // 3 points for 3 cubes and 3 additional points per extra cube
                         Globals.score += (scoreInc * 3);
+                        DisplayScoreText(scoreInc * 3);
                     }
                     selected = false;
                 }
             }
         }
-        Globals.clearGroup();
+        Globals.ClearGroup();
 
         transform.position = new Vector3(Mathf.Round(transform.position.x), transform.position.y, transform.position.z);
 
     }
-    */
+    
     // Update is called once per frame
     void FixedUpdate() {
         if(!Globals.paused) {
@@ -181,12 +186,12 @@ public class CubeProperties : MonoBehaviour {
                 fallSpeed = 2;
                 if (hit.transform.tag == "Boundary") {
                     transform.position = new Vector3(transform.position.x, Mathf.Round(transform.position.y), transform.position.z);
-                    checkBomb();
+                    CheckBomb();
                 }
                 else if (hit.transform.tag == "Cube") { 
                     if (!hit.transform.GetComponent<CubeProperties>().fall) {
                         transform.position = new Vector3(transform.position.x, Mathf.Round(transform.position.y), transform.position.z);
-                        checkBomb();  
+                        CheckBomb();  
                     }
                 }
             }
@@ -195,6 +200,9 @@ public class CubeProperties : MonoBehaviour {
 
 
             warning = false;
+
+            /* DISABLE WARNING FOR NOW
+
             // If there is an object below this one that is positioned over the threshold
             // then set the cube with a warning property
             if (Physics.Raycast(transform.position, Vector3.down, out hit)) {
@@ -211,7 +219,7 @@ public class CubeProperties : MonoBehaviour {
                             warning = true;
                 }
             }
-            
+            */
 
             Vector3 originU = new Vector3(transform.position.x, transform.position.y + size - 0.01f, transform.position.z);
             Vector3 originD = new Vector3(transform.position.x, transform.position.y - size + 0.01f, transform.position.z);
@@ -250,9 +258,12 @@ public class CubeProperties : MonoBehaviour {
             if (warning)
                 transform.GetChild(0).GetComponent<Renderer>().material = matWarning;
             else if (selected)
-                transform.GetChild(0).GetComponent<Renderer>().material = matSelected;
+                //transform.GetChild(0).GetComponent<Renderer>().material = matSelected;
+                transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white;
             else
-                transform.GetChild(0).GetComponent<Renderer>().material = mat;
+                //transform.GetChild(0).GetComponent<Renderer>().material = mat;
+                transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.black;
+            
         }
 
         // Cubes spawned in menu
@@ -266,7 +277,7 @@ public class CubeProperties : MonoBehaviour {
 
     // Select any cubes that are adjacent to the current one in 3 directions (excluding the previous one)
     // Uses recursion to add each cube to the global group
-    public void selectAdj(Vector3 dir) {
+    public void SelectAdj(Vector3 dir) {
         if (Physics.Raycast(transform.position, dir, out hit, size)) {
             if (hit.transform.tag == "Cube") { 
                 CubeProperties prop = hit.transform.GetComponent<CubeProperties>();
@@ -276,42 +287,65 @@ public class CubeProperties : MonoBehaviour {
                         Globals.group.Add(hit.transform.gameObject);
                 
                         if (dir != Vector3.left)
-                            prop.selectAdj(Vector3.right);
+                            prop.SelectAdj(Vector3.right);
                         if (dir != Vector3.right)
-                            prop.selectAdj(Vector3.left);
+                            prop.SelectAdj(Vector3.left);
                         if (dir != Vector3.up)
-                            prop.selectAdj(Vector3.down);
+                            prop.SelectAdj(Vector3.down);
                         if (dir != Vector3.down)
-                            prop.selectAdj(Vector3.up);
+                            prop.SelectAdj(Vector3.up);
                     }
                 }
             }
         }
     }
 
-    void destroyCube(Vector3 dir) {
+    // Destroys an adjacent cube to this one in the direction specified, if there is one add score and return true 
+    private bool DestroyCube(Vector3 dir) {
         if (Physics.Raycast(transform.position, dir, out hit, size * 2)) {
             if (hit.transform.tag == "Cube") {
                 if (hit.transform.GetComponent<CubeProperties>().selected)
-                    Globals.clearGroup();
+                    Globals.ClearGroup();
                 Destroy(hit.transform.gameObject);
                 Globals.score++;
+                return true;
             }
         }
+        return false;
+    }
+
+    // Spawns a text which displays how many points were accumulated from destroy blocks
+    private void DisplayScoreText(int score, bool destroyAtMouse = true)
+    {
+        Vector3 textPos;
+        if(destroyAtMouse)
+            textPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0)) + Vector3.back;
+        else
+        {
+            textPos = transform.position + Vector3.back;
+        }
+        Debug.Log(textPos);
+        float angle = Random.Range(0, 360);
+        //Vector3 targetPos = new Vector3(textPos.x, textPos.y, 0) + new Vector3(scoreDistance * Mathf.Cos(angle), scoreDistance * Mathf.Sin(angle), -1);
+        ScoreDisplay textObj = Instantiate(scoreText, textPos, Quaternion.identity).GetComponent<ScoreDisplay>();
+        textObj.startPos = textPos;
+        //textObj.targetPos = targetPos;
+        textObj.Score = score;
     }
 
     // If cube is a white bomb, destroy surrounding blocks
-    public void checkBomb() {
+    public void CheckBomb() {
         if(colour == Color.white) {
 
             // Find and destroy cubes in all surrounding directions upon landing
-            destroyCube(Vector3.left);
-            destroyCube(Vector3.right);
-            destroyCube(Vector3.down);
-            destroyCube(new Vector3(1, 1, 0));
-            destroyCube(new Vector3(1, -1, 0));
-            destroyCube(new Vector3(-1, -1, 0));
-            destroyCube(new Vector3(-1, 1, 0));
+            int scoreCount = 0;
+            if (DestroyCube(Vector3.left)) { scoreCount++; }
+            if (DestroyCube(Vector3.right)) { scoreCount++; }
+            if (DestroyCube(Vector3.down)) { scoreCount++; }
+            if (DestroyCube(new Vector3(1, 1, 0))) { scoreCount++; }
+            if (DestroyCube(new Vector3(1, -1, 0))) { scoreCount++; }
+            if (DestroyCube(new Vector3(-1, -1, 0))) { scoreCount++; }
+            if (DestroyCube(new Vector3(-1, 1, 0))) { scoreCount++; }
 
             /*
             int numOfRays = 8;
@@ -325,9 +359,10 @@ public class CubeProperties : MonoBehaviour {
                 destroyCube(dir);
             }*/
             if (Globals.group.Contains(gameObject))
-                Globals.clearGroup();
+                Globals.ClearGroup();
             Globals.score++;
-
+            // Amount of points gained is 1 per block including the white one
+            DisplayScoreText((scoreCount + 1), false);
             // Create an expanding frame on destroy
             Instantiate(wireFrame, transform.position, Quaternion.identity);
 
