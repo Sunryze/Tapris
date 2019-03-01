@@ -648,7 +648,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1942,7 +1942,7 @@ MonoBehaviour:
   pauseBtn: {fileID: 1679803384}
   resumeSprite: {fileID: 21300000, guid: f6e27b470c995d047b21a04cadf18eda, type: 3}
   helpText: {fileID: 302022754}
-  admob: {fileID: 1866112548}
+  admob: {fileID: 0}
 --- !u!1 &1060931454
 GameObject:
   m_ObjectHideFlags: 0
@@ -3183,46 +3183,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1801765240}
---- !u!1 &1866112548
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1866112550}
-  - component: {fileID: 1866112549}
-  m_Layer: 0
-  m_Name: AdManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1866112549
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1866112548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8aefb473e888874dacc2d744595a6fa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1866112550
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1866112548}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.954499, y: 4.967156, z: -1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1920546030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3342,7 +3302,7 @@ Prefab:
     - target: {fileID: 224707684983484404, guid: de46f06b10fb5d34a839310c8f39e7b1,
         type: 2}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 224707684983484404, guid: de46f06b10fb5d34a839310c8f39e7b1,
         type: 2}
